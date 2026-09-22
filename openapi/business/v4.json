@@ -1,0 +1,2310 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "GTO Wizard Business API",
+    "version": "4",
+    "description": "GTO Score reads the hand histories of a poker room and scores the decisions of a player against the solver.\n\nSend the access token of your application in the `Authorization` header: `Authorization: Bearer <access token>`. The guides explain how to get one."
+  },
+  "paths": {
+    "/v4/fair-play/gto-score/{task_id}/sign/": {
+      "post": {
+        "operationId": "presign_the_hand_files_of_a_gto_score_task",
+        "summary": "Presign the hand files of a GTO Score task",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "task_id",
+            "schema": {
+              "format": "uuid",
+              "title": "Task Id",
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GtoScoreSignResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "detail": {
+                      "title": "Detail",
+                      "type": "string"
+                    },
+                    "request_limit": {
+                      "description": "How many requests can user do in a minute",
+                      "title": "Request Limit",
+                      "type": "integer"
+                    },
+                    "time_period_in_seconds": {
+                      "description": "Time period in seconds",
+                      "title": "Time Period In Seconds",
+                      "type": "integer"
+                    },
+                    "simplified_time_period": {
+                      "anyOf": [
+                        {
+                          "$ref": "#/components/schemas/ThrottleTimePeriod"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "If time period is 1, 60, 3600 or 86400, it will be simplified to SECOND, MINUTE, HOUR or DAY"
+                    }
+                  },
+                  "required": [
+                    "detail",
+                    "request_limit",
+                    "time_period_in_seconds"
+                  ],
+                  "title": "ThrottleErrorResponse",
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "GTO Score"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GtoScoreSignRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v4/fair-play/gto-score/{task_id}/complete/": {
+      "post": {
+        "operationId": "close_the_upload_of_a_gto_score_task_and_start_the_scoring",
+        "summary": "Close the upload of a GTO Score task and start the scoring",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "task_id",
+            "schema": {
+              "format": "uuid",
+              "title": "Task Id",
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GtoScoreTaskAcceptedResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "detail": {
+                      "title": "Detail",
+                      "type": "string"
+                    },
+                    "request_limit": {
+                      "description": "How many requests can user do in a minute",
+                      "title": "Request Limit",
+                      "type": "integer"
+                    },
+                    "time_period_in_seconds": {
+                      "description": "Time period in seconds",
+                      "title": "Time Period In Seconds",
+                      "type": "integer"
+                    },
+                    "simplified_time_period": {
+                      "anyOf": [
+                        {
+                          "$ref": "#/components/schemas/ThrottleTimePeriod"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "If time period is 1, 60, 3600 or 86400, it will be simplified to SECOND, MINUTE, HOUR or DAY"
+                    }
+                  },
+                  "required": [
+                    "detail",
+                    "request_limit",
+                    "time_period_in_seconds"
+                  ],
+                  "title": "ThrottleErrorResponse",
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "GTO Score"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v4/fair-play/gto-score/": {
+      "post": {
+        "operationId": "open_a_gto_score_task",
+        "summary": "Open a GTO Score task",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GtoScoreTaskCreateResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "detail": {
+                      "title": "Detail",
+                      "type": "string"
+                    },
+                    "request_limit": {
+                      "description": "How many requests can user do in a minute",
+                      "title": "Request Limit",
+                      "type": "integer"
+                    },
+                    "time_period_in_seconds": {
+                      "description": "Time period in seconds",
+                      "title": "Time Period In Seconds",
+                      "type": "integer"
+                    },
+                    "simplified_time_period": {
+                      "anyOf": [
+                        {
+                          "$ref": "#/components/schemas/ThrottleTimePeriod"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "If time period is 1, 60, 3600 or 86400, it will be simplified to SECOND, MINUTE, HOUR or DAY"
+                    }
+                  },
+                  "required": [
+                    "detail",
+                    "request_limit",
+                    "time_period_in_seconds"
+                  ],
+                  "title": "ThrottleErrorResponse",
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "description": "Open a GTO Score task.\n\nThe request carries no file. Upload the hand histories through the `sign` and `complete` calls of the task.\nThe scoring starts when `complete` accepts the upload.\n\n`content_type` declares the one kind of hand that the task scores. `nlhe.cash.1` is No-Limit\nHold'em cash and is the default. `plo.cash.1` is 4-card Pot-Limit Omaha cash. Every hand of the\nupload must match the declaration: a hand of any other variant or format comes back with\n`billable: false` and a reject reason. Upload one kind of hand per task.\n\n## Scope\n\n`scope` picks how many seats of each hand the task scores.\n\n- `player` (the default) scores one seat per hand: the nickname in `player`, or the hero seat of the hand\n  when `player` is empty. One hand is one billable unit.\n- `table` scores every seat that shows hole cards. Each seat is a solve of its own and a billable unit of\n  its own, so a six-handed hand with six known hands costs six units and takes about six times as long.\n  `player` must be empty for a `table` scope.\n\n## Authentication\n\nAn OAuth2 application token with GTO Score enabled. Contact your GTO Wizard representative to enable it.\n\nOne task of an application runs at a time. Open the next task after the running one reaches\nSUCCESS or FAILURE.\n\n## Error responses\n\n- `GTO_SCORE_NOT_ENABLED` (403): the application has no access to GTO Score.\n- `GTO_SCORE_MONTHLY_LIMIT_REACHED` (403): the application spent its monthly hand limit. A sandbox\n  application carries one; a contracted application has none.\n- `GTO_SCORE_EFFORT_NOT_SUPPORTED` (400): `effort` is not one of the offered levels.\n- `GTO_SCORE_TASK_IN_FLIGHT` (409): the application already holds a task that has not finished.\n- 429: the application spent its write budget for the hour. `Retry-After` says when it refills.\n",
+        "tags": [
+          "GTO Score"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GtoScoreTaskCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v4/fair-play/gto-score/{task_id}/": {
+      "get": {
+        "operationId": "read_a_task_and_its_players_table",
+        "summary": "Read a task and its players table",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "task_id",
+            "schema": {
+              "format": "uuid",
+              "title": "Task Id",
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "default": 100,
+              "maximum": 1000,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "order_by",
+            "schema": {
+              "allOf": [
+                {
+                  "enum": [
+                    "-avg_gto_score",
+                    "avg_gto_score",
+                    "-count_hands",
+                    "count_hands",
+                    "-count_scored_actions",
+                    "count_scored_actions",
+                    "-avg_ev_loss",
+                    "avg_ev_loss",
+                    "-avg_frequency_difference",
+                    "avg_frequency_difference",
+                    "-player_nickname",
+                    "player_nickname"
+                  ],
+                  "title": "PlayerStatisticsOrderByEnum",
+                  "type": "string"
+                }
+              ],
+              "default": "-avg_gto_score",
+              "description": "Column of the players table to order by. A leading '-' orders descending. A player with no scored decision sorts last in both directions, and the nickname breaks every tie."
+            },
+            "required": false,
+            "description": "Column of the players table to order by. A leading '-' orders descending. A player with no scored decision sorts last in both directions, and the nickname breaks every tie."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GtoScoreTaskResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "detail": {
+                      "title": "Detail",
+                      "type": "string"
+                    },
+                    "request_limit": {
+                      "description": "How many requests can user do in a minute",
+                      "title": "Request Limit",
+                      "type": "integer"
+                    },
+                    "time_period_in_seconds": {
+                      "description": "Time period in seconds",
+                      "title": "Time Period In Seconds",
+                      "type": "integer"
+                    },
+                    "simplified_time_period": {
+                      "anyOf": [
+                        {
+                          "$ref": "#/components/schemas/ThrottleTimePeriod"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "If time period is 1, 60, 3600 or 86400, it will be simplified to SECOND, MINUTE, HOUR or DAY"
+                    }
+                  },
+                  "required": [
+                    "detail",
+                    "request_limit",
+                    "time_period_in_seconds"
+                  ],
+                  "title": "ThrottleErrorResponse",
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "description": "Read the state of a task and its players table, one page at a time.\n\nThis is the polling call of the flow: open the task, upload the hands through `sign` and `complete`, then\npoll here until `status` is `SUCCESS` or `FAILURE`.\n\nA `FAILURE` carries the reason in `error_message`. Every other status leaves that field empty.\n\n`billable_units` holds one entry per metric that the task billed. One scored hand is one unit of its\nmetric, so a hand priced both ways adds one unit to each. `hands_billable` is their sum.\n\n`items` holds one row per player of the task. It is empty until the task ends. `total` counts every player,\nso `offset` and `limit` walk the whole table. `order_by` picks the column and the direction.\n\nEvery score is in `[0.00, 1.00]`. `1.00` is the best action at every decision.\n\n## Error responses\n\n- `NOT_FOUND` (404): the task does not exist, or it belongs to another application.\n- `GTO_SCORE_NOT_ENABLED` (403): the application has no access to GTO Score.\n- 429: the application spent its read budget for the hour. `Retry-After` says when it refills.\n",
+        "tags": [
+          "GTO Score"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v4/fair-play/gto-score/{task_id}/hands/": {
+      "get": {
+        "operationId": "list_the_scored_hands_of_a_task",
+        "summary": "List the scored hands of a task",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "task_id",
+            "schema": {
+              "format": "uuid",
+              "title": "Task Id",
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "player",
+            "schema": {
+              "default": "",
+              "description": "Return only the hands of this nickname. Empty returns every hand of the task.",
+              "maxLength": 128,
+              "title": "Player",
+              "type": "string"
+            },
+            "required": false,
+            "description": "Return only the hands of this nickname. Empty returns every hand of the task."
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "default": 100,
+              "maximum": 1000,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedGtoScoreHandSchema"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "detail": {
+                      "title": "Detail",
+                      "type": "string"
+                    },
+                    "request_limit": {
+                      "description": "How many requests can user do in a minute",
+                      "title": "Request Limit",
+                      "type": "integer"
+                    },
+                    "time_period_in_seconds": {
+                      "description": "Time period in seconds",
+                      "title": "Time Period In Seconds",
+                      "type": "integer"
+                    },
+                    "simplified_time_period": {
+                      "anyOf": [
+                        {
+                          "$ref": "#/components/schemas/ThrottleTimePeriod"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "If time period is 1, 60, 3600 or 86400, it will be simplified to SECOND, MINUTE, HOUR or DAY"
+                    }
+                  },
+                  "required": [
+                    "detail",
+                    "request_limit",
+                    "time_period_in_seconds"
+                  ],
+                  "title": "ThrottleErrorResponse",
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "description": "List the scored hands of a task, one page at a time.\n\nThe rows are ordered by the time the hand was played. `total` counts every hand of the task that matches\nthe `player` filter, so `offset` and `limit` walk the whole set.\n\nEvery score is in `[0.00, 1.00]`. `1.00` is the best action. A hand that GTO Score could not solve has\n`billable: false`, a `reject_reason` and null scores.\n\n## Error responses\n\n- `NOT_FOUND` (404): the task does not exist, or it belongs to another application.\n- `GTO_SCORE_NOT_ENABLED` (403): the application has no access to GTO Score.\n- 429: the application spent its read budget for the hour. The body names the limit and the window.\n",
+        "tags": [
+          "GTO Score"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v4/fair-play/gto-score/{task_id}/hands/{hand_id}/": {
+      "get": {
+        "operationId": "read_the_scores_of_one_hand",
+        "summary": "Read the scores of one hand",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "task_id",
+            "schema": {
+              "format": "uuid",
+              "title": "Task Id",
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "hand_id",
+            "schema": {
+              "format": "uuid",
+              "title": "Hand Id",
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GtoScoreHandDetailResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "detail": {
+                      "title": "Detail",
+                      "type": "string"
+                    },
+                    "request_limit": {
+                      "description": "How many requests can user do in a minute",
+                      "title": "Request Limit",
+                      "type": "integer"
+                    },
+                    "time_period_in_seconds": {
+                      "description": "Time period in seconds",
+                      "title": "Time Period In Seconds",
+                      "type": "integer"
+                    },
+                    "simplified_time_period": {
+                      "anyOf": [
+                        {
+                          "$ref": "#/components/schemas/ThrottleTimePeriod"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "If time period is 1, 60, 3600 or 86400, it will be simplified to SECOND, MINUTE, HOUR or DAY"
+                    }
+                  },
+                  "required": [
+                    "detail",
+                    "request_limit",
+                    "time_period_in_seconds"
+                  ],
+                  "title": "ThrottleErrorResponse",
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "description": "Read the per-street and per-action scores of one hand.\n\nGTO Score keeps no hand histories, so the answer carries no hole cards, no board and no hand text. It\ncarries the actions of the scored seat, with the score, the EV loss, the solver frequency and the best\naction at each decision. The scores stay readable after the task's hands are purged.\n\nA hand that GTO Score could not solve answers the hand row with its `reject_reason` and no streets.\n\n## Error responses\n\n- `NOT_FOUND` (404): the task or the hand does not exist, or the task belongs to another application.\n- `GTO_SCORE_NOT_ENABLED` (403): the application has no access to GTO Score.\n- 429: the application spent its read budget for the hour. The body names the limit and the window.\n",
+        "tags": [
+          "GTO Score"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v4/fair-play/gto-score/{task_id}/exports/": {
+      "post": {
+        "operationId": "open_an_export_of_the_scored_actions_of_a_task",
+        "summary": "Open an export of the scored actions of a task",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "task_id",
+            "schema": {
+              "format": "uuid",
+              "title": "Task Id",
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GtoScoreExportResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "detail": {
+                      "title": "Detail",
+                      "type": "string"
+                    },
+                    "request_limit": {
+                      "description": "How many requests can user do in a minute",
+                      "title": "Request Limit",
+                      "type": "integer"
+                    },
+                    "time_period_in_seconds": {
+                      "description": "Time period in seconds",
+                      "title": "Time Period In Seconds",
+                      "type": "integer"
+                    },
+                    "simplified_time_period": {
+                      "anyOf": [
+                        {
+                          "$ref": "#/components/schemas/ThrottleTimePeriod"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "If time period is 1, 60, 3600 or 86400, it will be simplified to SECOND, MINUTE, HOUR or DAY"
+                    }
+                  },
+                  "required": [
+                    "detail",
+                    "request_limit",
+                    "time_period_in_seconds"
+                  ],
+                  "title": "ThrottleErrorResponse",
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "description": "Open an export of every scored action of a task.\n\nThe paged calls answer JSON one page at a time. This call answers one file instead, so a task of\n10,000 hands reaches you in one download. The file holds one row per scored action: the hand, the\nstreet, the action, the EV loss, the GTO score and the solver frequency.\n\nThe export is a job. This call answers 202 with an export id, and the file is written in the\nbackground. Poll `GET .../exports/{export_id}/` until `status` is `SUCCESS`, then download the file\nthrough the signed URL in `file.url`.\n\nA hand that GTO Score did not solve has no scored action, so it writes no row. Read the hands list\nfor the rejected hands of the task.\n\n`format` picks `csv` or `jsonl`. `columns` picks and orders the columns; an empty list writes every\ncolumn in the default order.\n\n## Error responses\n\n- `NOT_FOUND` (404): the task does not exist, or it belongs to another application.\n- `CONFLICT` (409): the task has not finished, or it already holds an export that is running.\n- `GTO_SCORE_NOT_ENABLED` (403): the application has no access to GTO Score.\n- 422: `format` is not an offered format, or `columns` names a column that does not exist or repeats one.\n- 429: the application spent its write budget for the hour. `Retry-After` says when it refills.\n",
+        "tags": [
+          "GTO Score"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GtoScoreExportCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v4/fair-play/gto-score/{task_id}/exports/{export_id}/": {
+      "get": {
+        "operationId": "read_an_export_and_its_download_link",
+        "summary": "Read an export and its download link",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "task_id",
+            "schema": {
+              "format": "uuid",
+              "title": "Task Id",
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "export_id",
+            "schema": {
+              "format": "uuid",
+              "title": "Export Id",
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GtoScoreExportResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "detail": {
+                      "title": "Detail",
+                      "type": "string"
+                    },
+                    "request_limit": {
+                      "description": "How many requests can user do in a minute",
+                      "title": "Request Limit",
+                      "type": "integer"
+                    },
+                    "time_period_in_seconds": {
+                      "description": "Time period in seconds",
+                      "title": "Time Period In Seconds",
+                      "type": "integer"
+                    },
+                    "simplified_time_period": {
+                      "anyOf": [
+                        {
+                          "$ref": "#/components/schemas/ThrottleTimePeriod"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "If time period is 1, 60, 3600 or 86400, it will be simplified to SECOND, MINUTE, HOUR or DAY"
+                    }
+                  },
+                  "required": [
+                    "detail",
+                    "request_limit",
+                    "time_period_in_seconds"
+                  ],
+                  "title": "ThrottleErrorResponse",
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "description": "Read the state of an export and get the link to its file.\n\n`status` is PENDING while the export waits for a worker, STARTED while it writes, then SUCCESS or\nFAILURE. `file` is null until the export reaches SUCCESS.\n\n`file.url` is a signed URL. It carries no credential of yours, it works for one GET, and it stops\nworking at `file.expires_at`. Read this call again for a new URL.\n\n## Error responses\n\n- `NOT_FOUND` (404): the export or the task does not exist, or the task belongs to another application.\n- `GTO_SCORE_NOT_ENABLED` (403): the application has no access to GTO Score.\n- 429: the application spent its read budget for the hour. The body names the limit and the window.\n",
+        "tags": [
+          "GTO Score"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ErrorResponse": {
+        "properties": {
+          "code": {
+            "$ref": "#/components/schemas/ErrorResponseCode"
+          },
+          "detail": {
+            "title": "Detail",
+            "type": "string"
+          },
+          "data": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data"
+          }
+        },
+        "required": [
+          "code",
+          "detail"
+        ],
+        "title": "ErrorResponse",
+        "type": "object"
+      },
+      "ErrorResponseCode": {
+        "enum": [
+          "NOT_FOUND",
+          "VALIDATION_ERROR",
+          "PERMISSION_DENIED",
+          "AUTHENTICATION_FAILED",
+          "CONFLICT",
+          "GTO_SCORE_NOT_ENABLED",
+          "UPLOAD_TOO_LARGE",
+          "UPLOAD_OBJECT_MISSING",
+          "GTO_SCORE_EFFORT_NOT_SUPPORTED",
+          "GTO_SCORE_TASK_IN_FLIGHT",
+          "GTO_SCORE_MONTHLY_LIMIT_REACHED"
+        ],
+        "title": "ErrorResponseCode",
+        "type": "string"
+      },
+      "ThrottleTimePeriod": {
+        "enum": [
+          "SECOND",
+          "MINUTE",
+          "HOUR",
+          "DAY"
+        ],
+        "title": "ThrottleTimePeriod",
+        "type": "string"
+      },
+      "HandCorrectnessStr": {
+        "enum": [
+          "BEST_MOVE",
+          "CORRECT_MOVE",
+          "INACCURACY",
+          "WRONG_MOVE",
+          "BLUNDER",
+          "UNSOLVED"
+        ],
+        "title": "HandCorrectnessStr",
+        "type": "string"
+      },
+      "StreetStr": {
+        "enum": [
+          "PREFLOP",
+          "FLOP",
+          "TURN",
+          "RIVER"
+        ],
+        "title": "StreetStr",
+        "type": "string"
+      },
+      "GtoScorePresignedPutSchema": {
+        "properties": {
+          "name": {
+            "description": "Echo of the declared name, so the partner can index the answer.",
+            "title": "Name",
+            "type": "string"
+          },
+          "key": {
+            "description": "S3 key that the URL writes. It always sits under the prefix of the task.",
+            "title": "Key",
+            "type": "string"
+          },
+          "url": {
+            "description": "Presigned PUT URL for one single-part upload.",
+            "title": "Url",
+            "type": "string"
+          },
+          "required_headers": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Headers that the PUT must carry unchanged. `Content-Length` is part of the signature, so a body of a different length fails at S3.",
+            "title": "Required Headers",
+            "type": "object"
+          }
+        },
+        "required": [
+          "name",
+          "key",
+          "url",
+          "required_headers"
+        ],
+        "title": "GtoScorePresignedPutSchema",
+        "type": "object"
+      },
+      "GtoScoreSignResponse": {
+        "properties": {
+          "task_id": {
+            "description": "The task that the presigned URLs write to.",
+            "format": "uuid",
+            "title": "Task Id",
+            "type": "string"
+          },
+          "presigned_puts": {
+            "description": "One entry per declared file, in the order of the request.",
+            "items": {
+              "$ref": "#/components/schemas/GtoScorePresignedPutSchema"
+            },
+            "title": "Presigned Puts",
+            "type": "array"
+          },
+          "expires_at": {
+            "description": "Time that every URL of this answer stops working.",
+            "format": "date-time",
+            "title": "Expires At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "task_id",
+          "presigned_puts",
+          "expires_at"
+        ],
+        "title": "GtoScoreSignResponse",
+        "type": "object"
+      },
+      "GtoScoreSignRequest": {
+        "properties": {
+          "files": {
+            "description": "The files to presign. Call sign again to add more, up to the file limit of one task.",
+            "items": {
+              "$ref": "#/components/schemas/GtoScoreUploadFileInput"
+            },
+            "minItems": 1,
+            "title": "Files",
+            "type": "array"
+          }
+        },
+        "required": [
+          "files"
+        ],
+        "title": "GtoScoreSignRequest",
+        "type": "object"
+      },
+      "GtoScoreUploadFileInput": {
+        "properties": {
+          "name": {
+            "description": "File name as it lands in S3 under the prefix of the task. Letters, digits and `._-` only, no path separator and no `..`. A name that ends with `.gz` is read as one gzip member.",
+            "maxLength": 255,
+            "title": "Name",
+            "type": "string"
+          },
+          "size_bytes": {
+            "description": "Byte count of the body that the partner will PUT. The API refuses a file over the size limit; the error message states the limit.",
+            "exclusiveMinimum": 0,
+            "title": "Size Bytes",
+            "type": "integer"
+          },
+          "kind": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GtoScoreUploadFileKind"
+              }
+            ],
+            "default": "HANDS",
+            "description": "What the file holds. `HANDS` is the hand-history export, and it is the default. `TOURNAMENT_INPUTS` is a JSON Lines file that carries the payout structure and the per-hand tournament state, which a hand history does not hold. The two kinds never share a file."
+          }
+        },
+        "required": [
+          "name",
+          "size_bytes"
+        ],
+        "title": "GtoScoreUploadFileInput",
+        "type": "object"
+      },
+      "GtoScoreUploadFileKind": {
+        "description": "What one declared file of a task holds.\n\nThe two kinds never share a stream. The orchestrator joins every `HANDS` object into one hand\nstream and picks the serialization format from its first line, so a JSON sidecar in that stream\nwould set the format of the whole task to JSON.",
+        "enum": [
+          "HANDS",
+          "TOURNAMENT_INPUTS"
+        ],
+        "title": "GtoScoreUploadFileKind",
+        "type": "string"
+      },
+      "GtoScoreTaskAcceptedResponse": {
+        "properties": {
+          "task_id": {
+            "description": "The task that the pipeline now scores.",
+            "format": "uuid",
+            "title": "Task Id",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/GtoScoreTaskStatus",
+            "description": "Status of the task at the moment of the answer. The starter moves PENDING to STARTED."
+          }
+        },
+        "required": [
+          "task_id",
+          "status"
+        ],
+        "title": "GtoScoreTaskAcceptedResponse",
+        "type": "object"
+      },
+      "GtoScoreTaskStatus": {
+        "enum": [
+          "PENDING",
+          "STARTED",
+          "SUCCESS",
+          "FAILURE"
+        ],
+        "title": "GtoScoreTaskStatus",
+        "type": "string"
+      },
+      "GtoScoreContentType": {
+        "description": "The one kind of hand that a task scores. The partner declares it when it opens the task.\n\nThe `.1` suffix is the version of the scoring of that content. A later change to how GTO Score\nscores Hold'em cash arrives as `nlhe.cash.2`, and the partner keeps the earlier contract until\nit moves.",
+        "enum": [
+          "nlhe.cash.1",
+          "plo.cash.1"
+        ],
+        "title": "GtoScoreContentType",
+        "type": "string"
+      },
+      "GtoScoreMetric": {
+        "description": "What a score prices.\n\n`CHIP_EV` prices a decision in chips. It is the only meaning a cash hand can carry, and it is\nwhat the MTT chipEV trees give a tournament hand.\n\n`ICM` prices a decision in tournament equity, through the Independent Chip Model. It needs the\npayout structure, the players still in the tournament and the chips they hold, so it needs a\ntournament sidecar record for the hand.",
+        "enum": [
+          "CHIP_EV",
+          "ICM"
+        ],
+        "title": "GtoScoreMetric",
+        "type": "string"
+      },
+      "GtoScoreScope": {
+        "enum": [
+          "player",
+          "table"
+        ],
+        "title": "GtoScoreScope",
+        "type": "string"
+      },
+      "GtoScoreTaskCreateResponse": {
+        "properties": {
+          "task_id": {
+            "description": "Identifier of the task. The upload and the status calls take it in the path.",
+            "format": "uuid",
+            "title": "Task Id",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/GtoScoreTaskStatus",
+            "description": "PENDING until the upload is complete and the scoring starts."
+          },
+          "effort": {
+            "description": "Solver effort level of the task. 0 is fast and 1 is standard.",
+            "title": "Effort",
+            "type": "integer"
+          },
+          "player": {
+            "description": "Nickname of the scored seat. Empty means the hero seat of each hand.",
+            "title": "Player",
+            "type": "string"
+          },
+          "content_type": {
+            "$ref": "#/components/schemas/GtoScoreContentType",
+            "description": "The one kind of hand that this task scores."
+          },
+          "scope": {
+            "$ref": "#/components/schemas/GtoScoreScope",
+            "description": "How many seats of each hand to score. `player` scores one seat per hand. `table` scores every seat that shows hole cards. Each scored seat is one solve and one billable unit, so a six-handed hand with six known hands costs six units, not one."
+          },
+          "metrics": {
+            "description": "What to price, and how many billable units each hand costs. One entry is one unit, so a hand priced both ways costs two. CHIP_EV prices a decision in chips and applies to every hand. ICM prices it in tournament equity and applies to a tournament hand only. An empty list, the default, lets GTO Score pick one metric per hand: ICM when a tournament sidecar record names the hand, CHIP_EV otherwise.",
+            "items": {
+              "$ref": "#/components/schemas/GtoScoreMetric"
+            },
+            "title": "Metrics",
+            "type": "array"
+          }
+        },
+        "required": [
+          "task_id",
+          "status",
+          "effort",
+          "player",
+          "content_type",
+          "scope",
+          "metrics"
+        ],
+        "title": "GtoScoreTaskCreateResponse",
+        "type": "object"
+      },
+      "GtoScoreTaskCreateRequest": {
+        "properties": {
+          "player": {
+            "default": "",
+            "description": "Nickname of the one seat to score. Empty means the hero seat of each hand. Leave it empty when `scope` is `table`.",
+            "maxLength": 128,
+            "title": "Player",
+            "type": "string"
+          },
+          "effort": {
+            "default": 1,
+            "description": "Solver effort level. 0 is fast and 1 is standard. Any other value answers 400.",
+            "title": "Effort",
+            "type": "integer"
+          },
+          "content_type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GtoScoreContentType"
+              }
+            ],
+            "default": "nlhe.cash.1",
+            "description": "The one kind of hand that this task scores. `nlhe.cash.1` is No-Limit Hold'em cash and `plo.cash.1` is 4-card Pot-Limit Omaha cash. A hand of any other kind comes back with `billable: false` and `VARIANT_NOT_SUPPORTED` or a format reason."
+          },
+          "scope": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GtoScoreScope"
+              }
+            ],
+            "default": "player",
+            "description": "How many seats of each hand to score. `player` scores one seat per hand. `table` scores every seat that shows hole cards. Each scored seat is one solve and one billable unit, so a six-handed hand with six known hands costs six units, not one."
+          },
+          "metrics": {
+            "description": "What to price, and how many billable units each hand costs. One entry is one unit, so a hand priced both ways costs two. CHIP_EV prices a decision in chips and applies to every hand. ICM prices it in tournament equity and applies to a tournament hand only. An empty list, the default, lets GTO Score pick one metric per hand: ICM when a tournament sidecar record names the hand, CHIP_EV otherwise.",
+            "items": {
+              "$ref": "#/components/schemas/GtoScoreMetric"
+            },
+            "title": "Metrics",
+            "type": "array"
+          }
+        },
+        "title": "GtoScoreTaskCreateRequest",
+        "type": "object"
+      },
+      "GtoScorePlayerSchema": {
+        "properties": {
+          "player_nickname": {
+            "description": "Nickname of the player, as the poker site wrote it.",
+            "title": "Player Nickname",
+            "type": "string"
+          },
+          "count_hands": {
+            "description": "Hands of the task the player took part in, scored or not.",
+            "title": "Count Hands",
+            "type": "integer"
+          },
+          "count_scored_actions": {
+            "description": "Decisions of the player that GTO Score solved. The sample size behind the averages.",
+            "title": "Count Scored Actions",
+            "type": "integer"
+          },
+          "avg_gto_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Mean GTO score of the player's hands, in [0.00, 1.00]. 1.00 is the best action at every decision. Null when no decision was scored.",
+            "title": "Avg Gto Score"
+          },
+          "avg_ev_loss": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Mean EV loss per hand, in big blinds. Null when no decision was scored.",
+            "title": "Avg Ev Loss"
+          },
+          "avg_frequency_difference": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Mean per-hand sum of the difference between the frequency of the action taken and the solver frequency. Null when no decision was scored.",
+            "title": "Avg Frequency Difference"
+          }
+        },
+        "required": [
+          "player_nickname",
+          "count_hands",
+          "count_scored_actions"
+        ],
+        "title": "GtoScorePlayerSchema",
+        "type": "object"
+      },
+      "GtoScoreTaskResponse": {
+        "properties": {
+          "task_id": {
+            "description": "Identifier of the task.",
+            "format": "uuid",
+            "title": "Task Id",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/GtoScoreTaskStatus",
+            "description": "PENDING before the upload is complete, STARTED while the hands are scored, then SUCCESS or FAILURE."
+          },
+          "error_message": {
+            "description": "Why the task ended as FAILURE, written for you to act on. Empty for every other status. A task fails for a whole-task reason: the files mix serialization formats, a .gz file is not readable gzip, the upload holds too many hands, or it expands past the byte cap.",
+            "title": "Error Message",
+            "type": "string"
+          },
+          "effort": {
+            "description": "Solver effort level of the task. 0 is fast and 1 is standard.",
+            "title": "Effort",
+            "type": "integer"
+          },
+          "player": {
+            "description": "Nickname of the scored seat. Empty means the hero seat of each hand.",
+            "title": "Player",
+            "type": "string"
+          },
+          "content_type": {
+            "$ref": "#/components/schemas/GtoScoreContentType",
+            "description": "The one kind of hand that this task scores."
+          },
+          "scope": {
+            "$ref": "#/components/schemas/GtoScoreScope",
+            "description": "How many seats of each hand to score. `player` scores one seat per hand. `table` scores every seat that shows hole cards. Each scored seat is one solve and one billable unit, so a six-handed hand with six known hands costs six units, not one."
+          },
+          "metrics": {
+            "description": "What to price, and how many billable units each hand costs. One entry is one unit, so a hand priced both ways costs two. CHIP_EV prices a decision in chips and applies to every hand. ICM prices it in tournament equity and applies to a tournament hand only. An empty list, the default, lets GTO Score pick one metric per hand: ICM when a tournament sidecar record names the hand, CHIP_EV otherwise.",
+            "items": {
+              "$ref": "#/components/schemas/GtoScoreMetric"
+            },
+            "title": "Metrics",
+            "type": "array"
+          },
+          "billable_units": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "description": "Billable units of the task so far, per metric. One scored hand is one unit of its metric, so a hand priced both ways adds one unit to each. A metric with no billable unit is absent. The sum equals `hands_billable`.",
+            "propertyNames": {
+              "$ref": "#/components/schemas/GtoScoreMetric"
+            },
+            "title": "Billable Units",
+            "type": "object"
+          },
+          "hands_total": {
+            "description": "Hands in the upload. 0 until the upload is split for scoring.",
+            "title": "Hands Total",
+            "type": "integer"
+          },
+          "hands_scored": {
+            "description": "Hands that GTO Score solved. 0 until the pipeline derives it.",
+            "title": "Hands Scored",
+            "type": "integer"
+          },
+          "hands_unscored": {
+            "description": "Hands that GTO Score accepted and the solver did not score. 0 until the pipeline derives it.",
+            "title": "Hands Unscored",
+            "type": "integer"
+          },
+          "hands_rejected": {
+            "description": "Hands that GTO Score refused before the solve, e.g. a tournament hand or a seat without cards. 0 until the pipeline derives it.",
+            "title": "Hands Rejected",
+            "type": "integer"
+          },
+          "hands_billable": {
+            "description": "Billable units of the task over every metric. Written when the task ends.",
+            "title": "Hands Billable",
+            "type": "integer"
+          },
+          "hands_purged_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Time the hand histories of the task were deleted. Null while they are kept. The scores stay.",
+            "title": "Hands Purged At"
+          },
+          "last_processed_id": {
+            "description": "Hand number, as the poker site wrote it, of the last hand the scoring reached. Empty until the pipeline derives it.",
+            "title": "Last Processed Id",
+            "type": "string"
+          },
+          "items": {
+            "description": "One row per player of the task, in the requested order. Empty until the task ends.",
+            "items": {
+              "$ref": "#/components/schemas/GtoScorePlayerSchema"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "description": "Number of players of the task.",
+            "title": "Total",
+            "type": "integer"
+          },
+          "limit": {
+            "description": "Limit of rows in this page.",
+            "title": "Limit",
+            "type": "integer"
+          },
+          "offset": {
+            "description": "Offset of this page.",
+            "title": "Offset",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "task_id",
+          "status",
+          "error_message",
+          "effort",
+          "player",
+          "content_type",
+          "scope",
+          "metrics",
+          "billable_units",
+          "hands_total",
+          "hands_scored",
+          "hands_unscored",
+          "hands_rejected",
+          "hands_billable",
+          "last_processed_id",
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "title": "GtoScoreTaskResponse",
+        "type": "object"
+      },
+      "GtoScoreHandSchema": {
+        "properties": {
+          "hand_id": {
+            "description": "Identifier of the hand. The detail call takes it in the path.",
+            "format": "uuid",
+            "title": "Hand Id",
+            "type": "string"
+          },
+          "original_hand_id": {
+            "description": "Hand number that the poker site wrote.",
+            "title": "Original Hand Id",
+            "type": "string"
+          },
+          "player": {
+            "description": "Nickname of the scored seat.",
+            "title": "Player",
+            "type": "string"
+          },
+          "played_at": {
+            "format": "date-time",
+            "title": "Played At",
+            "type": "string"
+          },
+          "metric": {
+            "$ref": "#/components/schemas/GtoScoreMetric",
+            "description": "What the scores of this hand price. CHIP_EV prices a decision in chips. ICM prices it in tournament equity, and needs a tournament sidecar record for the hand."
+          },
+          "hand_correctness": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/HandCorrectnessStr"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Correctness of the WORST action of the seat. UNSOLVED when the hand has no solution."
+          },
+          "gto_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "GTO score of the WORST action of the seat, in [0.00, 1.00]. Null when the hand has no solution.",
+            "title": "Gto Score"
+          },
+          "avg_gto_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Mean GTO score of the seat's actions, in [0.00, 1.00]. Null when the hand has no solution.",
+            "title": "Avg Gto Score"
+          },
+          "total_ev_loss": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Sum of the EV lost over the seat's actions, in big blinds. Null when the hand has no solution.",
+            "title": "Total Ev Loss"
+          },
+          "billable": {
+            "description": "False for a hand that GTO Score could not solve. Nobody pays for it.",
+            "title": "Billable",
+            "type": "boolean"
+          },
+          "reject_reason": {
+            "description": "Why the hand was not solved, e.g. 'TOURNAMENT_NOT_SUPPORTED'. Empty for a scored hand.",
+            "title": "Reject Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "hand_id",
+          "original_hand_id",
+          "player",
+          "played_at",
+          "metric",
+          "billable",
+          "reject_reason"
+        ],
+        "title": "GtoScoreHandSchema",
+        "type": "object"
+      },
+      "PagedGtoScoreHandSchema": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/GtoScoreHandSchema"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "description": "Total number of records",
+            "title": "Total",
+            "type": "integer"
+          },
+          "limit": {
+            "description": "Limit of records in current page",
+            "title": "Limit",
+            "type": "integer"
+          },
+          "offset": {
+            "description": "Offset of the page. The rows are ordered by the time the hand was played.",
+            "title": "Offset",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "title": "PagedGtoScoreHandSchema",
+        "type": "object"
+      },
+      "GtoScoreActionSchema": {
+        "properties": {
+          "sequence_num": {
+            "description": "Order of the decision in the hand, from 0.",
+            "title": "Sequence Num",
+            "type": "integer"
+          },
+          "position": {
+            "description": "Position of the scored seat at this decision, e.g. 'BTN'.",
+            "title": "Position",
+            "type": "string"
+          },
+          "action": {
+            "description": "Exact action code the seat took, e.g. 'F', 'X', 'R2.5'.",
+            "title": "Action",
+            "type": "string"
+          },
+          "size": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Chips the action put in. Null when the action has no size.",
+            "title": "Size"
+          },
+          "gto_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "GTO score of the action, in [0.00, 1.00]. 1.00 is the best action. Null when the spot has no solution.",
+            "title": "Gto Score"
+          },
+          "ev_loss": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "EV lost against the best action at this decision, in big blinds. Null when unsolved.",
+            "title": "Ev Loss"
+          },
+          "solver_frequency": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Frequency the solver takes this action, in [0, 1]. Null when unsolved.",
+            "title": "Solver Frequency"
+          },
+          "best_action": {
+            "description": "Action code the solver values highest at this decision. Empty when unsolved.",
+            "title": "Best Action",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sequence_num",
+          "position",
+          "action",
+          "best_action"
+        ],
+        "title": "GtoScoreActionSchema",
+        "type": "object"
+      },
+      "GtoScoreHandDetailResponse": {
+        "properties": {
+          "hand_id": {
+            "description": "Identifier of the hand. The detail call takes it in the path.",
+            "format": "uuid",
+            "title": "Hand Id",
+            "type": "string"
+          },
+          "original_hand_id": {
+            "description": "Hand number that the poker site wrote.",
+            "title": "Original Hand Id",
+            "type": "string"
+          },
+          "player": {
+            "description": "Nickname of the scored seat.",
+            "title": "Player",
+            "type": "string"
+          },
+          "played_at": {
+            "format": "date-time",
+            "title": "Played At",
+            "type": "string"
+          },
+          "metric": {
+            "$ref": "#/components/schemas/GtoScoreMetric",
+            "description": "What the scores of this hand price. CHIP_EV prices a decision in chips. ICM prices it in tournament equity, and needs a tournament sidecar record for the hand."
+          },
+          "hand_correctness": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/HandCorrectnessStr"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Correctness of the WORST action of the seat. UNSOLVED when the hand has no solution."
+          },
+          "gto_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "GTO score of the WORST action of the seat, in [0.00, 1.00]. Null when the hand has no solution.",
+            "title": "Gto Score"
+          },
+          "avg_gto_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Mean GTO score of the seat's actions, in [0.00, 1.00]. Null when the hand has no solution.",
+            "title": "Avg Gto Score"
+          },
+          "total_ev_loss": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Sum of the EV lost over the seat's actions, in big blinds. Null when the hand has no solution.",
+            "title": "Total Ev Loss"
+          },
+          "billable": {
+            "description": "False for a hand that GTO Score could not solve. Nobody pays for it.",
+            "title": "Billable",
+            "type": "boolean"
+          },
+          "reject_reason": {
+            "description": "Why the hand was not solved, e.g. 'TOURNAMENT_NOT_SUPPORTED'. Empty for a scored hand.",
+            "title": "Reject Reason",
+            "type": "string"
+          },
+          "streets": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/GtoScoreStreetResultSchema"
+            },
+            "description": "Results per street, keyed PREFLOP, FLOP, TURN, RIVER in that order. A street the seat took no action on is absent. Empty for a hand that was not solved.",
+            "propertyNames": {
+              "$ref": "#/components/schemas/StreetStr"
+            },
+            "title": "Streets",
+            "type": "object"
+          }
+        },
+        "required": [
+          "hand_id",
+          "original_hand_id",
+          "player",
+          "played_at",
+          "metric",
+          "billable",
+          "reject_reason",
+          "streets"
+        ],
+        "title": "GtoScoreHandDetailResponse",
+        "type": "object"
+      },
+      "GtoScoreStreetResultSchema": {
+        "properties": {
+          "gto_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "GTO score of the WORST action of the seat on this street, in [0.00, 1.00]. Null when every action is unsolved.",
+            "title": "Gto Score"
+          },
+          "actions": {
+            "description": "Actions of the seat on this street, in play order.",
+            "items": {
+              "$ref": "#/components/schemas/GtoScoreActionSchema"
+            },
+            "title": "Actions",
+            "type": "array"
+          }
+        },
+        "required": [
+          "actions"
+        ],
+        "title": "GtoScoreStreetResultSchema",
+        "type": "object"
+      },
+      "GtoScoreExportColumn": {
+        "description": "One column of the export. The declaration order is the default column order of a file.",
+        "enum": [
+          "original_hand_id",
+          "hand_id",
+          "player",
+          "played_at",
+          "billable",
+          "street",
+          "sequence_num",
+          "position",
+          "action",
+          "size",
+          "gto_score",
+          "ev_loss",
+          "solver_frequency",
+          "best_action"
+        ],
+        "title": "GtoScoreExportColumn",
+        "type": "string"
+      },
+      "GtoScoreExportFileSchema": {
+        "properties": {
+          "name": {
+            "description": "File name, which is the export id and the format suffix.",
+            "title": "Name",
+            "type": "string"
+          },
+          "byte_size": {
+            "description": "Size of the file in bytes.",
+            "title": "Byte Size",
+            "type": "integer"
+          },
+          "row_count": {
+            "description": "Scored actions in the file. The CSV header row is not counted.",
+            "title": "Row Count",
+            "type": "integer"
+          },
+          "url": {
+            "description": "Signed URL to download the file with one GET. It carries no credential.",
+            "title": "Url",
+            "type": "string"
+          },
+          "expires_at": {
+            "description": "Time the URL stops working. Read the export again for a new URL.",
+            "format": "date-time",
+            "title": "Expires At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "byte_size",
+          "row_count",
+          "url",
+          "expires_at"
+        ],
+        "title": "GtoScoreExportFileSchema",
+        "type": "object"
+      },
+      "GtoScoreExportFormat": {
+        "enum": [
+          "csv",
+          "jsonl"
+        ],
+        "title": "GtoScoreExportFormat",
+        "type": "string"
+      },
+      "GtoScoreExportResponse": {
+        "properties": {
+          "export_id": {
+            "description": "Identifier of the export. The read call takes it in the path.",
+            "format": "uuid",
+            "title": "Export Id",
+            "type": "string"
+          },
+          "task_id": {
+            "description": "The task whose scored actions the export writes.",
+            "format": "uuid",
+            "title": "Task Id",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/GtoScoreExportStatus",
+            "description": "PENDING while the export waits for a worker, STARTED while it writes, then SUCCESS or FAILURE."
+          },
+          "format": {
+            "$ref": "#/components/schemas/GtoScoreExportFormat",
+            "description": "File format of the export."
+          },
+          "columns": {
+            "description": "Columns of the file, in the order they are written.",
+            "items": {
+              "$ref": "#/components/schemas/GtoScoreExportColumn"
+            },
+            "title": "Columns",
+            "type": "array"
+          },
+          "error_message": {
+            "description": "Why the export ended as FAILURE. Empty for every other status.",
+            "title": "Error Message",
+            "type": "string"
+          },
+          "file": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/GtoScoreExportFileSchema"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The written file and how to download it. Null until the export reaches SUCCESS."
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Time the export reached SUCCESS or FAILURE. Null while it runs.",
+            "title": "Finished At"
+          }
+        },
+        "required": [
+          "export_id",
+          "task_id",
+          "status",
+          "format",
+          "columns",
+          "error_message",
+          "created_at"
+        ],
+        "title": "GtoScoreExportResponse",
+        "type": "object"
+      },
+      "GtoScoreExportStatus": {
+        "enum": [
+          "PENDING",
+          "STARTED",
+          "SUCCESS",
+          "FAILURE"
+        ],
+        "title": "GtoScoreExportStatus",
+        "type": "string"
+      },
+      "GtoScoreExportCreateRequest": {
+        "properties": {
+          "format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GtoScoreExportFormat"
+              }
+            ],
+            "default": "csv",
+            "description": "File format of the export. `csv` holds a header row; `jsonl` holds one JSON object per line."
+          },
+          "columns": {
+            "description": "Columns to write, in the order to write them. An empty list writes every column in the default order. The columns are: original_hand_id, hand_id, player, played_at, billable, street, sequence_num, position, action, size, gto_score, ev_loss, solver_frequency, best_action.",
+            "items": {
+              "$ref": "#/components/schemas/GtoScoreExportColumn"
+            },
+            "maxItems": 14,
+            "title": "Columns",
+            "type": "array"
+          }
+        },
+        "title": "GtoScoreExportCreateRequest",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "The OAuth2 access token of your application, from the client-credentials token call. See the Authentication guide."
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "https://business.gtowizard.com",
+      "description": "Production server"
+    }
+  ]
+}

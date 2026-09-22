@@ -1,2 +1,85 @@
-# api-docs
-GTO Wizard public API documentation. Served at https://developers.gtowizard.com
+# GTO Wizard API documentation
+
+The public reference and guides for the GTO Wizard partner API, served at
+**https://developers.gtowizard.com**.
+
+Version 1 covers GTO Score. The API itself runs on `https://business.gtowizard.com`.
+
+**This repository is public, history included.** Commit only what a partner may read.
+
+## What is here
+
+| Path | What it is |
+| --- | --- |
+| `index.html`, `assets/` | The page. It loads Scalar and the files below. No build step. |
+| `vendor/scalar/standalone.js` | [Scalar API Reference](https://github.com/scalar/scalar) 1.71.0, MIT, copied unchanged. See `vendor/scalar/LICENSE`. |
+| `openapi/business/v4.json` | The current GTO Score schema. |
+| `openapi/business/<tag>.json` | A frozen copy of the schema for each Release. |
+| `openapi/business/releases.json` | The list of snapshots. The site shows them in its version menu. |
+| `guides/*.md`, `guides/index.json` | The guides. The site shows them above the reference, in the order of `index.json`. |
+| `scripts/prepare_schema.py` | Makes the public schema from the backend schema, and checks it. |
+| `.github/workflows/check.yaml` | Checks every pull request. |
+| `.github/workflows/release-snapshot.yaml` | Snapshots the schema when a Release is published. |
+
+## How the site updates
+
+1. A change to the backend schema on `master` of the backend repository runs a sync workflow there.
+   It runs `scripts/prepare_schema.py` and opens a pull request here that replaces
+   `openapi/business/v4.json`.
+2. A human reviews and merges the pull request. `main` is protected.
+3. GitHub Pages serves `main` directly, so the merge publishes the site within a few minutes.
+
+To change a guide, edit the file under `guides/` and open a pull request.
+
+## Record a version
+
+Publish a Release with a tag such as `v4.2026-09-22`. The `release-snapshot` workflow copies the
+current schema to `openapi/business/<tag>.json`, adds it to `releases.json` and opens a pull
+request. Merge it, and the snapshot appears in the version menu of the site.
+
+A snapshot never changes. The workflow refuses a tag that already has one.
+
+## What the page does not do
+
+- **No live "Try It".** The API host sends no CORS headers yet, so a browser cannot call it. The
+  page offers the token box and copyable code samples only.
+- **No third-party request.** The Content-Security-Policy in `index.html` lets the page connect only
+  to this site and to `business.gtowizard.com`. This blocks the Scalar request proxy, its telemetry
+  and its web fonts. A token typed into the page never leaves the browser.
+- **No stored token.** The token lives only in the open tab.
+
+## Run it locally
+
+```shell
+python3 -m http.server 8000
+```
+
+Then open http://localhost:8000.
+
+## Update Scalar
+
+1. Download the new version: `npm pack @scalar/api-reference@<version>`.
+2. Copy `package/dist/browser/standalone.js` to `vendor/scalar/standalone.js`.
+3. Update the version in `vendor/scalar/LICENSE`, in this file and in `check.yaml`, and the
+   `SCALAR_SHA256` value in `check.yaml`.
+4. Run the site locally. Check that the token box shows, that the token appears in the samples, and
+   that the browser makes no request to another host.
+
+## The custom domain
+
+GitHub Pages is new in this organization. The order matters, because a DNS name that points at
+GitHub Pages before a repository claims it can be taken over by another GitHub account.
+
+1. Verify `gtowizard.com` for GitHub Pages in the organization settings (Settings → Pages →
+   Add a domain). GitHub shows a TXT record `_github-pages-challenge-gto-wizard`.
+2. In one infrastructure pull request, add the TXT record, the Pages custom domain on this
+   repository (`cname = "developers.gtowizard.com"`), and the DNS-only CNAME
+   `developers` → `gto-wizard.github.io`. Apply the repository first and the DNS records second.
+3. The `CNAME` file in this repository already holds `developers.gtowizard.com`, so GitHub does
+   not need to commit one to the protected `main`. Before the DNS apply, check that
+   `gh api repos/gto-wizard/api-docs/pages` shows `"cname": "developers.gtowizard.com"`.
+4. Wait until GitHub shows the certificate as issued, then turn on **Enforce HTTPS** in the
+   repository's Pages settings.
+5. Keep the Cloudflare record DNS-only for now. GitHub cannot issue or renew its certificate behind
+   the Cloudflare proxy. Turn the proxy on only as a separate, planned change, with the zone SSL
+   mode at Full.
