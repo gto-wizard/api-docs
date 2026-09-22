@@ -1,0 +1,48 @@
+name: check
+
+# This repository is public. The check refuses a schema or a guide that carries an
+# internal path, host, ticket id or credential, and a site whose files do not load.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          persist-credentials: false
+
+      - name: Schemas are public-safe
+        run: python3 scripts/prepare_schema.py --check openapi/business/v*.json
+
+      - name: Guides are public-safe
+        run: python3 scripts/prepare_schema.py --check-text guides/*.md
+
+      - name: Every listed guide and snapshot exists
+        run: |
+          python3 - <<'EOF'
+          import json, pathlib, sys
+          missing = [f"guides/{f}" for f in json.load(open("guides/index.json"))
+                     if not pathlib.Path("guides", f).is_file()]
+          missing += [f"openapi/business/{r['file']}"
+                      for r in json.load(open("openapi/business/releases.json"))["releases"]
+                      if not pathlib.Path("openapi/business", r["file"]).is_file()]
+          for m in missing:
+              print(f"::error::listed but missing: {m}")
+          sys.exit(1 if missing else 0)
+          EOF
+
+      - name: The vendored Scalar bundle is unchanged
+        run: echo "${SCALAR_SHA256}  vendor/scalar/standalone.js" | shasum -a 256 -c -
+        env:
+          # sha256 of dist/browser/standalone.js in @scalar/api-reference 1.71.0.
+          # Update it together with the bundle.
+          SCALAR_SHA256: 08ef75a0b4503c1630316f8ffce1de95fd4a90fd78201a3d811b51cb90ac2085

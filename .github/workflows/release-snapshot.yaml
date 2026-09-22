@@ -1,0 +1,74 @@
+name: release-snapshot
+
+# A published Release records one version of the contract. This workflow copies the
+# current schema to openapi/business/<tag>.json, lists it in releases.json, and opens
+# a pull request. `main` is protected, so a human merges the snapshot.
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: release-snapshot
+  cancel-in-progress: false
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          ref: main
+          persist-credentials: false
+
+      - name: Validate the tag
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          if ! printf '%s' "$TAG" | grep -Eq '^v[0-9][0-9A-Za-z._-]{0,63}$'; then
+            echo "::error::Release tag '$TAG' must start with v and a digit, and hold only letters, digits and . _ -"
+            exit 1
+          fi
+          if [ -e "openapi/business/${TAG}.json" ]; then
+            echo "::error::openapi/business/${TAG}.json already exists. A snapshot never changes."
+            exit 1
+          fi
+
+      - name: Write the snapshot
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          cp openapi/business/v4.json "openapi/business/${TAG}.json"
+          python3 - <<'EOF'
+          import json, os
+          path = "openapi/business/releases.json"
+          releases = json.load(open(path))
+          tag = os.environ["TAG"]
+          releases["releases"].append({"tag": tag, "file": f"{tag}.json"})
+          with open(path, "w") as f:
+              json.dump(releases, f, indent=2)
+              f.write("\n")
+          EOF
+          python3 scripts/prepare_schema.py --check "openapi/business/${TAG}.json"
+
+      - name: Open the pull request
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+          RELEASE_URL: ${{ github.event.release.html_url }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          branch="release-snapshot/${TAG}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git add "openapi/business/${TAG}.json" openapi/business/releases.json
+          git commit -m "Snapshot the schema for release ${TAG}"
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "$branch"
+          gh pr create --base main --head "$branch" \
+            --title "Snapshot the schema for release ${TAG}" \
+            --body "Adds \`openapi/business/${TAG}.json\`, a copy of the current schema, for ${RELEASE_URL}. The site lists it in the version menu after the merge."

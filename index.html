@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!--
+      The browser may connect only to this site and to the API host. This blocks the
+      Scalar request proxy, its telemetry and its web fonts, so a partner token typed
+      into the page can never leave the browser for a third party.
+      'unsafe-inline' for styles: Scalar injects its CSS at run time.
+    -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://business.gtowizard.com; worker-src 'self' blob:; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'"
+    />
+    <meta name="referrer" content="no-referrer" />
+    <title>GTO Wizard API</title>
+    <meta name="description" content="Reference and guides for the GTO Wizard public API." />
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="assets/site.css" />
+  </head>
+  <body>
+    <div id="app"></div>
+    <noscript>This page needs JavaScript. The raw schema is at <a href="openapi/business/v4.json">openapi/business/v4.json</a>.</noscript>
+    <div id="load-error" hidden>
+      The documentation did not load. Reload the page. The raw schema is at
+      <a href="openapi/business/v4.json">openapi/business/v4.json</a>.
+    </div>
+    <script src="vendor/scalar/standalone.js"></script>
+    <script src="assets/app.js"></script>
+  </body>
+</html>

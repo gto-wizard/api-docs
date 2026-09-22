@@ -1,0 +1,21 @@
+/* Scalar ships without its web fonts here (they load from a third-party host). */
+:root {
+  --scalar-font: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --scalar-font-code: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+/*
+ * No live "Try It" in this version: the API host sends no CORS headers yet.
+ * The config keeps the button enabled only because disabling it also removes the
+ * token box, so hide the button here.
+ */
+.show-api-client-button {
+  display: none !important;
+}
+
+#load-error {
+  margin: 2rem auto;
+  max-width: 40rem;
+  padding: 1rem;
+  font-family: var(--scalar-font);
+}
