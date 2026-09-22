@@ -1651,17 +1651,17 @@
             "type": "integer"
           },
           "hands_scored": {
-            "description": "Hands that GTO Score solved. 0 until the pipeline derives it.",
+            "description": "Units that GTO Score solved and bills. It equals `hands_billable`. Written when the task ends.",
             "title": "Hands Scored",
             "type": "integer"
           },
           "hands_unscored": {
-            "description": "Hands that GTO Score accepted and the solver did not score. 0 until the pipeline derives it.",
+            "description": "Units that GTO Score accepted and the solver did not score. They carry an empty `reject_reason` and are not billed. Written when the task ends.",
             "title": "Hands Unscored",
             "type": "integer"
           },
           "hands_rejected": {
-            "description": "Hands that GTO Score refused before the solve, e.g. a tournament hand or a seat without cards. 0 until the pipeline derives it.",
+            "description": "Units that carry a `reject_reason`, e.g. a shape with no solver tree. They are not billed. Written when the task ends.",
             "title": "Hands Rejected",
             "type": "integer"
           },
@@ -1684,7 +1684,7 @@
             "title": "Hands Purged At"
           },
           "last_processed_id": {
-            "description": "Hand number, as the poker site wrote it, of the last hand the scoring reached. Empty until the pipeline derives it.",
+            "description": "Hand number, as the poker site wrote it, of the last hand of the furthest part of the upload that the scoring finished. It moves forward only, and it is empty until the first part finishes. Hands before it can still be in progress, so it measures progress and does not mark a point that is complete.",
             "title": "Last Processed Id",
             "type": "string"
           },
