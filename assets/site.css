@@ -1,49 +1,46 @@
 /* GTO Wizard brand, applied to Scalar.
  *
- * The brand is dark. Inter carries the text, Poppins carries the headings, and the
- * electric green marks one thing at a time: a link, an active item, the accent of a
+ * The values come from the Brand Architecture Manual, which is the brand
+ * authority, not from the application's own theme. Where the two disagree, this
+ * file follows the manual:
+ *
+ *  - the manual gives ONE base colour, Lead Black #202022, and ONE highlight,
+ *    Electric Green #AAFBB2, and says both are applied uniformly across every
+ *    brand environment. The application's darker page colour is not used here.
+ *  - the manual names Poppins as the standard font, for web among other media.
+ *    So Poppins carries the headings AND the text. Inter is not in the manual
+ *    and is not used. The display face, PP Monument, is licensed for print,
+ *    social and video, not for web, so it is not used either.
+ *
+ * The surface steps above the base come from the design system, because the
+ * manual defines no elevation scale and a reference page needs one.
+ *
+ * The green marks one thing at a time: a link, an active item, the accent of a
  * control. It is a signal, not a background.
  *
- * The faces are copied from the design system, not linked from a font host. A third
- * host on a page that holds a partner token is a risk the site does not need, and
- * the Content-Security-Policy in index.html blocks one anyway. The licences travel
- * with the files, as the SIL Open Font Licence asks: assets/fonts/OFL-Inter.txt and
- * assets/fonts/OFL-Poppins.txt.
+ * The faces are copied from the design system, not linked from a font host. A
+ * third host on a page that holds a partner token is a risk the site does not
+ * need, and the Content-Security-Policy in index.html blocks one anyway. The
+ * licence travels with the files: assets/fonts/OFL-Poppins.txt.
  *
- * Latin only, and only the weights below. A glyph outside that range falls through
- * to the next family in the stack.
+ * Latin only, and only the weights below. A glyph outside that range falls
+ * through to the next family in the stack.
  */
 
 @font-face {
-  font-family: 'Inter';
+  font-family: 'Poppins';
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url('fonts/inter-400.woff2') format('woff2');
+  src: url('fonts/poppins-400.woff2') format('woff2');
 }
 
 @font-face {
-  font-family: 'Inter';
+  font-family: 'Poppins';
   font-style: normal;
   font-weight: 500;
   font-display: swap;
-  src: url('fonts/inter-500.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url('fonts/inter-600.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url('fonts/inter-700.woff2') format('woff2');
+  src: url('fonts/poppins-500.woff2') format('woff2');
 }
 
 @font-face {
@@ -54,19 +51,22 @@
   src: url('fonts/poppins-600.woff2') format('woff2');
 }
 
-/* The brand tokens, copied from the design system. */
 :root {
   color-scheme: dark;
 
-  --gtow-green: #aafbb2;
+  /* The two colours of the manual. */
+  --gtow-green: #aafbb2; /* Electric Green, the main highlight colour */
+  --gtow-bg: #202022; /* Lead Black, the main background colour */
+
+  /* Derived from the green. The manual gives no pressed or dim variant. */
   --gtow-green-dark: #67de73;
   --gtow-green-dim: rgba(170, 251, 178, 0.1);
   --gtow-green-border: rgba(170, 251, 178, 0.25);
 
-  --gtow-bg: #09090c;
-  --gtow-surface-1: #121214;
-  --gtow-surface-2: #161618;
-  --gtow-surface-3: #1e1e21;
+  /* Steps above the base, from the design system's elevation scale. */
+  --gtow-surface-1: #26262a;
+  --gtow-surface-2: #2b2b30;
+  --gtow-surface-3: #303036;
 
   --gtow-fg-1: #ffffff;
   --gtow-fg-2: rgba(255, 255, 255, 0.7);
@@ -85,7 +85,7 @@
 
 /* The same tokens, under the names Scalar reads. */
 :root {
-  --scalar-font: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --scalar-font: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   --scalar-font-code: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
   --scalar-background-1: var(--gtow-bg);
@@ -148,7 +148,7 @@ body {
   color: var(--gtow-fg-1);
 }
 
-/* Poppins carries the headings. Inter carries everything else. */
+/* Poppins Semibold for a heading, the weight the manual shows. */
 .scalar-app h1,
 .scalar-app h2,
 .scalar-app h3,
@@ -156,7 +156,6 @@ body {
 .markdown h1,
 .markdown h2,
 .markdown h3 {
-  font-family: 'Poppins', 'Inter', system-ui, sans-serif;
   font-weight: 600;
 }
 
@@ -164,14 +163,29 @@ body {
   background-color: color-mix(in srgb, var(--gtow-green) 24%, transparent);
 }
 
-/* The brand mark, above the sidebar. */
+/*
+ * The brand lockup, above the sidebar. The manual fixes its shape: the mark on
+ * the left, the name on the right, the green mark and the white name, no rotation,
+ * no stroke, no effect, and clear space around the whole of about one mark width.
+ *
+ * So `Developers` is NOT part of the lockup. It sits past that clear space, behind
+ * a rule, in muted text. A green chip beside the name would read as part of the
+ * mark, which the manual does not allow.
+ */
 #brand {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
   padding: 1rem 1.25rem;
   background: var(--gtow-surface-1);
   border-bottom: 1px solid var(--gtow-divider);
+}
+
+#brand .brand-lockup {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  /* The clear space of the manual: about the width of the mark. */
+  padding-right: 1.625rem;
 }
 
 #brand svg {
@@ -180,7 +194,6 @@ body {
 }
 
 #brand .brand-name {
-  font-family: 'Poppins', 'Inter', system-ui, sans-serif;
   font-weight: 600;
   font-size: 0.9375rem;
   letter-spacing: 0.01em;
@@ -188,15 +201,11 @@ body {
 }
 
 #brand .brand-kind {
-  font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--gtow-green);
-  border: 1px solid var(--gtow-green-border);
-  background: var(--gtow-green-dim);
-  border-radius: 999px;
-  padding: 0.125rem 0.5rem;
+  padding-left: 1.625rem;
+  border-left: 1px solid var(--gtow-divider);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--gtow-fg-3);
 }
 
 /*
