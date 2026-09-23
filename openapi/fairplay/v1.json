@@ -1,0 +1,391 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "FairPlay API",
+    "version": "1.0.0",
+    "description": "FairPlay compares the hands of a poker room against the solution lookups that GTO Wizard served, and reports where the two meet in time. Send a batch of finished hands, then read the matches.\n\nSend the access token of your application in the `Authorization` header: `Authorization: Bearer <access token>`. The guides explain how to get one."
+  },
+  "servers": [{ "url": "https://api.gtowizard.com" }],
+  "security": [{ "BearerAuth": [] }],
+  "tags": [
+    { "name": "Authentication", "description": "Get an access token." },
+    { "name": "Batches", "description": "Send a file of hands and read the matches." },
+    { "name": "Players", "description": "Read the recent lookups of one player." }
+  ],
+  "paths": {
+    "/v1/account/oauth/token/": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Get an access token",
+        "operationId": "get_an_access_token",
+        "description": "Exchange the client id and the client secret of your application for an access token. Put `<client id>:<client secret>` in the `Authorization` header as HTTP Basic. The token lives for 10 hours. Ask for a new one when it expires.",
+        "security": [{ "BasicAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": { "$ref": "#/components/schemas/TokenRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The access token.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Token" },
+                "example": {
+                  "access_token": "<access token>",
+                  "expires_in": 36000,
+                  "token_type": "Bearer",
+                  "scope": "read"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The client id or the client secret is wrong."
+          }
+        }
+      }
+    },
+    "/v1/poker/fair-play/": {
+      "post": {
+        "tags": ["Batches"],
+        "summary": "Send a batch of hands",
+        "operationId": "send_a_batch_of_hands",
+        "description": "Send a CSV file of finished hands. The file needs a header row and the four columns `id`, `board`, `board_dealt_at` and `hand_finished_at`. A file holds at most 100000 rows.\n\nThe call answers with a task id. Keep it. You read the result with that id.\n\nThe work runs in the background. Nothing is ready when this call answers.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": { "$ref": "#/components/schemas/BatchRequest" },
+              "encoding": { "file": { "contentType": "text/csv" } }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The batch is accepted.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/BatchAccepted" },
+                "example": {
+                  "task_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                  "state": "PENDING",
+                  "variant": "NLHOLDEM"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The file or the variant is not acceptable, or the monthly limit is reached.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "examples": {
+                  "limit_reached": {
+                    "summary": "The monthly limit is reached",
+                    "value": { "error": "Your monthly upload limit has been reached." }
+                  },
+                  "headers_unreadable": {
+                    "summary": "The header row cannot be read",
+                    "value": { "error": "Could not parse CSV headers." }
+                  },
+                  "headers_missing": {
+                    "summary": "A column is absent",
+                    "value": { "error": "Missing required CSV headers: board, hand_finished_at." }
+                  },
+                  "too_many_rows": {
+                    "summary": "The file holds more than 100000 rows",
+                    "value": { "error": "File has too many rows (120000). Maximum allowed is 100000." }
+                  },
+                  "bad_variant": {
+                    "summary": "The variant is not one this API takes",
+                    "value": { "error": "Invalid variant: 'PLO8'." }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "The access token is absent, wrong or expired." }
+        }
+      }
+    },
+    "/v1/poker/fair-play/{task_id}/": {
+      "get": {
+        "tags": ["Batches"],
+        "summary": "Read a batch",
+        "operationId": "read_a_batch",
+        "description": "Read the state of one batch. Ask again until `status` is `SUCCESS` or `FAILURE`.\n\nOn `SUCCESS` the answer holds `result.file_url`, a link to the result CSV. The link lives for 24 hours. Ask again for a new one.\n\nThe answer always reports your monthly record limit and how much of it you used.",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "description": "The task id from the batch call.",
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The state of the batch.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Batch" },
+                "examples": {
+                  "pending": {
+                    "summary": "The work has not finished",
+                    "value": {
+                      "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                      "status": "STARTED",
+                      "variant": "NLHOLDEM",
+                      "limit": 100000,
+                      "quota": 15000,
+                      "error_message": null
+                    }
+                  },
+                  "success": {
+                    "summary": "The result is ready",
+                    "value": {
+                      "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                      "status": "SUCCESS",
+                      "variant": "NLHOLDEM",
+                      "limit": 100000,
+                      "quota": 15000,
+                      "error_message": null,
+                      "result": {
+                        "file_url": "<a link to the result file>",
+                        "expires_in": 86400,
+                        "last_processed_id": "hand-000123"
+                      }
+                    }
+                  },
+                  "failure": {
+                    "summary": "The work stopped",
+                    "value": {
+                      "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                      "status": "FAILURE",
+                      "variant": "NLHOLDEM",
+                      "limit": 100000,
+                      "quota": 15000,
+                      "error_message": "The file could not be read."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "The access token is absent, wrong or expired." },
+          "404": {
+            "description": "No batch of your application has this id.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "error": "Task not found" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/poker/fair-play/users/{user_id}/boards/": {
+      "get": {
+        "tags": ["Players"],
+        "summary": "Read the boards of a player",
+        "operationId": "read_the_boards_of_a_player",
+        "description": "Read the most recent boards that one GTO Wizard player looked up, newest first. The player id is the `User ID` column of a result file.\n\nThis call answers with JSON. It holds the same facts as a row of the result file.",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "description": "The player id from the `User ID` column of a result file.",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "description": "Keep only the lookups after this moment. Write the time with its offset, for example `2026-03-22 20:34:52+00:00`, and encode it for the URL.",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "How many boards to answer with, from 1 to 500.",
+            "schema": { "type": "integer", "minimum": 1, "maximum": 500, "default": 100 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The boards, newest first.",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Board" } },
+                "example": [
+                  {
+                    "id": "5a5ccf3d-7432-44c7-9b93-a1ff958e2a60",
+                    "user_id": "acc_000000000",
+                    "created_at": "2026-03-21T13:58:06.155879+01:00",
+                    "original_board": "AsKsQs",
+                    "format": "Cash",
+                    "gametype_name": "Cash6m500zBasic",
+                    "depth": "100.000",
+                    "stacks": "100.000-100.000-100.000-100.000-100.000-100.000",
+                    "pot": "5.500",
+                    "ip_position": "BTN",
+                    "oop_positions": ["BB"],
+                    "actions": "F-F-F-R2.5-F-C|X"
+                  }
+                ]
+              }
+            }
+          },
+          "401": { "description": "The access token is absent, wrong or expired." },
+          "404": { "description": "No player has this id." }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "The access token of your application, from the token call. See the Authentication guide."
+      },
+      "BasicAuth": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "The client id and the client secret of your application. The token call takes this, and no other call does."
+      }
+    },
+    "schemas": {
+      "TokenRequest": {
+        "type": "object",
+        "required": ["grant_type"],
+        "properties": {
+          "grant_type": {
+            "type": "string",
+            "enum": ["client_credentials"],
+            "description": "Always `client_credentials`."
+          }
+        }
+      },
+      "Token": {
+        "type": "object",
+        "required": ["access_token", "expires_in", "token_type", "scope"],
+        "properties": {
+          "access_token": { "type": "string", "description": "Put this in the `Authorization` header of every other call." },
+          "expires_in": { "type": "integer", "description": "How many seconds the token lives. 36000, which is 10 hours." },
+          "token_type": { "type": "string", "enum": ["Bearer"] },
+          "scope": { "type": "string", "description": "What the token can do. `read`." }
+        }
+      },
+      "BatchRequest": {
+        "type": "object",
+        "required": ["file"],
+        "properties": {
+          "file": {
+            "type": "string",
+            "format": "binary",
+            "description": "The CSV file of finished hands. A header row is necessary. The columns are `id`, `board`, `board_dealt_at` and `hand_finished_at`. A semicolon or a comma can separate them."
+          },
+          "variant": {
+            "$ref": "#/components/schemas/Variant"
+          }
+        }
+      },
+      "Variant": {
+        "type": "string",
+        "enum": ["NLHOLDEM", "PLO4"],
+        "default": "NLHOLDEM",
+        "description": "The game of every row in the file. One file holds one game."
+      },
+      "BatchAccepted": {
+        "type": "object",
+        "required": ["task_id", "state"],
+        "properties": {
+          "task_id": { "type": "string", "format": "uuid", "description": "Keep this. You read the result with it." },
+          "state": { "type": "string", "enum": ["PENDING"] },
+          "variant": { "$ref": "#/components/schemas/Variant" }
+        }
+      },
+      "Batch": {
+        "type": "object",
+        "required": ["id", "status", "limit", "quota"],
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "status": { "$ref": "#/components/schemas/BatchStatus" },
+          "variant": { "$ref": "#/components/schemas/Variant" },
+          "limit": { "type": "integer", "description": "How many records your application can send each month." },
+          "quota": { "type": "integer", "description": "How many records your application sent this month." },
+          "error_message": {
+            "type": "string",
+            "nullable": true,
+            "description": "Why the work stopped. Only on `FAILURE`."
+          },
+          "result": {
+            "$ref": "#/components/schemas/BatchResult"
+          }
+        }
+      },
+      "BatchStatus": {
+        "type": "string",
+        "enum": ["PENDING", "STARTED", "SUCCESS", "FAILURE"],
+        "description": "`PENDING` and `STARTED` mean the work continues. `SUCCESS` means the result is ready. `FAILURE` means the work stopped, and `error_message` says why."
+      },
+      "BatchResult": {
+        "type": "object",
+        "description": "Only on `SUCCESS`.",
+        "required": ["file_url", "expires_in"],
+        "properties": {
+          "file_url": {
+            "type": "string",
+            "description": "A link to the result CSV. Download it before it expires."
+          },
+          "expires_in": {
+            "type": "integer",
+            "description": "How many seconds the link lives. 86400, which is 24 hours. Read the batch again for a new link."
+          },
+          "last_processed_id": {
+            "type": "string",
+            "nullable": true,
+            "description": "The `id` of the last row the work reached. A batch stops here when your monthly limit runs out. Send the rest of the file after the limit resets."
+          }
+        }
+      },
+      "Board": {
+        "type": "object",
+        "description": "One solution lookup.",
+        "properties": {
+          "id": { "type": "string", "format": "uuid", "description": "The id of the lookup." },
+          "user_id": { "type": "string", "description": "The player who made the lookup." },
+          "created_at": { "type": "string", "format": "date-time", "description": "When the player made the lookup." },
+          "original_board": { "type": "string", "description": "The board, for example `AsKsQs`." },
+          "format": { "type": "string", "description": "The game format, for example `Cash`. `CUSTOM` means the player used a tree of their own." },
+          "gametype_name": { "type": "string", "description": "The solution the player opened." },
+          "depth": { "type": "string", "description": "The stack depth in big blinds. Empty when the solution does not name one." },
+          "stacks": { "type": "string", "description": "The stack of every seat, joined by `-`." },
+          "pot": { "type": "string", "description": "The pot at the point of the lookup." },
+          "ip_position": { "type": "string", "description": "The seat in position, for example `BTN`." },
+          "oop_positions": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "The seats out of position, for example `[\"BB\"]`."
+          },
+          "actions": { "type": "string", "description": "The action line of the lookup, for example `F-F-F-R2.5-F-C|X`." }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": { "type": "string", "description": "What is wrong, in one sentence." }
+        }
+      }
+    }
+  }
+}

@@ -20,11 +20,26 @@
     <link rel="stylesheet" href="assets/site.css" />
   </head>
   <body>
+    <!--
+      The mark is the GTO Wizard W, inline so that the page loads no extra file and
+      the Content-Security-Policy needs no image host. `currentColor` takes the brand
+      green from assets/site.css.
+    -->
+    <header id="brand">
+      <svg xmlns="http://www.w3.org/2000/svg" width="26" height="20" fill="none" viewBox="0 0 26 20" role="img" aria-label="GTO Wizard">
+        <path fill="currentColor" fill-rule="evenodd" d="m7.796 19.95 2.627-4.874 2.116-1.149-1.628.315 1.792-4.193-1.072-2.94 3.294 2.587.642 2.366-1.207-.275 1.318.952.097.54 1.613 4.473-2.956-.83 3.159 1.67.575 1.408h.014L26 0c-1.459.31-3.11.555-4.931.746L18.02 9.548 15.055 1.11c-.676.02-1.357.035-2.062.035s-1.372-.015-2.048-.02l-2.98 8.434L4.912.741C3.106.555 1.46.31 0 0l7.743 19.814z" clip-rule="evenodd" />
+      </svg>
+      <span class="brand-name">GTO Wizard</span>
+      <span class="brand-kind">Developers</span>
+    </header>
     <div id="app"></div>
-    <noscript>This page needs JavaScript. The raw schema is at <a href="openapi/business/v4.json">openapi/business/v4.json</a>.</noscript>
+    <noscript>This page needs JavaScript. The raw schemas are at
+      <a href="openapi/business/v4.json">openapi/business/v4.json</a> and
+      <a href="openapi/fairplay/v1.json">openapi/fairplay/v1.json</a>.</noscript>
     <div id="load-error" hidden>
-      The documentation did not load. Reload the page. The raw schema is at
-      <a href="openapi/business/v4.json">openapi/business/v4.json</a>.
+      The documentation did not load. Reload the page. The raw schemas are at
+      <a href="openapi/business/v4.json">openapi/business/v4.json</a> and
+      <a href="openapi/fairplay/v1.json">openapi/fairplay/v1.json</a>.
     </div>
     <script src="vendor/scalar/standalone.js"></script>
     <script src="assets/app.js"></script>

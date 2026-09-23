@@ -1,7 +1,7 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "GTO Wizard Business API",
+    "title": "GTO Score API",
     "version": "4",
     "description": "GTO Score reads the hand histories of a poker room and scores the decisions of a player against the solver.\n\nSend the access token of your application in the `Authorization` header: `Authorization: Bearer <access token>`. The guides explain how to get one."
   },

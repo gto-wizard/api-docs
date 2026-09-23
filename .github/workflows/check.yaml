@@ -21,23 +21,29 @@ jobs:
           persist-credentials: false
 
       - name: Schemas are public-safe
-        run: python3 scripts/prepare_schema.py --check openapi/business/v*.json
+        run: python3 scripts/prepare_schema.py --check openapi/business/v*.json openapi/fairplay/v*.json
 
       - name: Guides are public-safe
-        run: python3 scripts/prepare_schema.py --check-text guides/*.md
+        run: python3 scripts/prepare_schema.py --check-text guides/*.md guides/fairplay/*.md
 
       - name: Every listed guide and snapshot exists
         run: |
           python3 - <<'EOF'
           import json, pathlib, sys
-          missing = [f"guides/{f}" for f in json.load(open("guides/index.json"))
-                     if not pathlib.Path("guides", f).is_file()]
+          # guides/index.json holds one list per product.
+          listed = [f for files in json.load(open("guides/index.json")).values() for f in files]
+          missing = [f"guides/{f}" for f in listed if not pathlib.Path("guides", f).is_file()]
           missing += [f"openapi/business/{r['file']}"
                       for r in json.load(open("openapi/business/releases.json"))["releases"]
                       if not pathlib.Path("openapi/business", r["file"]).is_file()]
+          # Every guide file must be listed, or the site never shows it.
+          unlisted = [str(p.relative_to("guides")) for p in pathlib.Path("guides").rglob("*.md")
+                      if str(p.relative_to("guides")) not in listed]
           for m in missing:
               print(f"::error::listed but missing: {m}")
-          sys.exit(1 if missing else 0)
+          for u in unlisted:
+              print(f"::error::guide not listed in guides/index.json: guides/{u}")
+          sys.exit(1 if missing or unlisted else 0)
           EOF
 
       - name: The vendored Scalar bundle is unchanged

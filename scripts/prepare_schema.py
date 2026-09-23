@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Turn the backend's business OpenAPI document into the public one.
+"""Turn the backend's business OpenAPI document into the public one, and guard
+every OpenAPI document this site publishes.
+
+The site holds one document per product: GTO Score, made by this script from the
+backend schema, and FairPlay, written by hand because the backend generates no
+schema for that API. `--check` reads both, so a hand-written document gets the
+same reading as a generated one.
 
 This repository is public, so every schema that enters it passes through this
 script. The script changes three things and refuses the rest:
@@ -24,10 +30,35 @@ import re
 import sys
 from pathlib import Path
 
-PATH_PREFIX = "/v4/fair-play/gto-score/"
-SERVER_URL = "https://business.gtowizard.com"
 SOURCE_SCHEME = "GtoScoreApplicationAuthentication"
 PUBLIC_SCHEME = "BearerAuth"
+BASIC_SCHEME = "BasicAuth"
+
+# The site holds one document per product. `prepare` only makes the GTO Score one,
+# from the backend schema. The FairPlay document is written by hand, because the
+# backend generates no schema for that API. `check` guards both, so a hand-written
+# document gets the same reading as a generated one.
+#
+# A product is named by its server URL. Every published document must match one.
+PRODUCTS = {
+    "https://business.gtowizard.com": {
+        "name": "GTO Score",
+        "prefixes": ("/v4/fair-play/gto-score/",),
+        "schemes": {PUBLIC_SCHEME},
+    },
+    "https://api.gtowizard.com": {
+        "name": "FairPlay",
+        "prefixes": ("/v1/poker/fair-play/", "/v1/account/oauth/token/"),
+        # The token call takes the client id and the client secret as HTTP Basic.
+        # Every other call takes the access token.
+        "schemes": {PUBLIC_SCHEME, BASIC_SCHEME},
+    },
+}
+
+# The backend calls this document the business API, which is the name of the door,
+# not the name of the product. The site holds more than one product, so it names
+# each one.
+TITLE = "GTO Score API"
 
 DESCRIPTION = (
     "GTO Score reads the hand histories of a poker room and scores the decisions "
@@ -43,6 +74,14 @@ BEARER = {
         "The OAuth2 access token of your application, from the client-credentials "
         "token call. See the Authentication guide."
     ),
+}
+
+# The wire formats a published document may declare. A document that declares a
+# scheme of a different shape, for example an apiKey in a query parameter, would
+# put the credential somewhere a partner must not put it, so the check refuses it.
+ALLOWED_SCHEME_SHAPES = {
+    PUBLIC_SCHEME: {"type": "http", "scheme": "bearer"},
+    BASIC_SCHEME: {"type": "http", "scheme": "basic"},
 }
 
 # The error codes a GTO Score call can answer. The backend enum lists every code
@@ -71,9 +110,9 @@ FORBIDDEN = {
     "cloud resource": re.compile(r"\b(?:s3://|arn:aws|amazonaws\.com)"),
     "e-mail address": re.compile(r"\b[\w.+-]+@[\w-]+\.[\w.]+\b"),
 }
-# Every gtowizard.com host except the public API host is internal.
+# Every gtowizard.com host except a public API host is internal.
 GTOWIZARD_HOST = re.compile(r"\b(?:[\w-]+\.)+gtowizard\.com\b")
-PUBLIC_HOSTS = {"business.gtowizard.com"}
+PUBLIC_HOSTS = {"business.gtowizard.com", "api.gtowizard.com"}
 
 
 class SchemaError(Exception):
@@ -90,6 +129,7 @@ def operation_id(operation: dict) -> str:
 
 
 def prepare(doc: dict) -> dict:
+    doc["info"]["title"] = TITLE
     doc["info"]["description"] = DESCRIPTION
     for operation in _operations(doc):
         operation["operationId"] = operation_id(operation)
@@ -118,22 +158,49 @@ def check(doc: dict) -> list[str]:
     problems = []
     if not str(doc.get("openapi", "")).startswith("3."):
         problems.append("the document is not OpenAPI 3")
+
+    # The server names the product, and the product says which paths and which
+    # credentials are its own. An unknown server stops the check here: without a
+    # product there is nothing to measure the rest of the document against.
+    servers = [s.get("url") for s in doc.get("servers", [])]
+    if len(servers) != 1 or servers[0] not in PRODUCTS:
+        return sorted(
+            set(
+                problems
+                + [f"servers must be exactly one of {sorted(PRODUCTS)}, got {servers}"]
+            )
+        )
+    product = PRODUCTS[servers[0]]
+
     paths = list(doc.get("paths", {}))
     if not paths:
         problems.append("the document has no paths")
-    problems += [f"path outside {PATH_PREFIX}: {p}" for p in paths if not p.startswith(PATH_PREFIX)]
-    servers = [s.get("url") for s in doc.get("servers", [])]
-    if servers != [SERVER_URL]:
-        problems.append(f"servers must be exactly [{SERVER_URL}], got {servers}")
-    if doc.get("components", {}).get("securitySchemes") != {PUBLIC_SCHEME: BEARER}:
-        problems.append(f"securitySchemes must be exactly the {PUBLIC_SCHEME} bearer scheme")
+    problems += [
+        f"{product['name']}: path outside {list(product['prefixes'])}: {p}"
+        for p in paths
+        if not p.startswith(product["prefixes"])
+    ]
+
+    schemes = doc.get("components", {}).get("securitySchemes", {})
+    if set(schemes) != product["schemes"]:
+        problems.append(
+            f"{product['name']}: securitySchemes must be exactly {sorted(product['schemes'])}, "
+            f"got {sorted(schemes)}"
+        )
+    for name, scheme in schemes.items():
+        shape = ALLOWED_SCHEME_SHAPES.get(name)
+        if shape is None:
+            problems.append(f"security scheme {name!r} is not one this site publishes")
+        elif {k: scheme.get(k) for k in shape} != shape:
+            problems.append(f"security scheme {name!r} does not carry the credential as {shape}")
+
     ids = []
     for operation in _operations(doc):
         ids.append(operation.get("operationId"))
         if operation.get("summary") and operation.get("operationId") != operation_id(operation):
             problems.append(f"operationId {operation.get('operationId')!r} is not the slug of its summary")
         for requirement in operation.get("security", []):
-            if set(requirement) - {PUBLIC_SCHEME}:
+            if set(requirement) - product["schemes"]:
                 problems.append(f"operation {operation.get('operationId')} names {sorted(requirement)}")
     if len(ids) != len(set(ids)):
         problems.append("two operations share an operationId")
