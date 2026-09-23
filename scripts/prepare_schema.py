@@ -52,6 +52,10 @@ PRODUCTS = {
         # The token call takes the client id and the client secret as HTTP Basic.
         # Every other call takes the access token.
         "schemes": {PUBLIC_SCHEME, BASIC_SCHEME},
+        # The client secret is the long-lived credential. It belongs on the token
+        # call and nowhere else. Without this line a later edit could move it onto
+        # a data path, and the check would not notice.
+        "scheme_paths": {BASIC_SCHEME: ("/v1/account/oauth/token/",)},
     },
 }
 
@@ -194,14 +198,22 @@ def check(doc: dict) -> list[str]:
         elif {k: scheme.get(k) for k in shape} != shape:
             problems.append(f"security scheme {name!r} does not carry the credential as {shape}")
 
+    scheme_paths = product.get("scheme_paths", {})
     ids = []
-    for operation in _operations(doc):
+    for path, operation in _path_operations(doc):
         ids.append(operation.get("operationId"))
         if operation.get("summary") and operation.get("operationId") != operation_id(operation):
             problems.append(f"operationId {operation.get('operationId')!r} is not the slug of its summary")
         for requirement in operation.get("security", []):
             if set(requirement) - product["schemes"]:
                 problems.append(f"operation {operation.get('operationId')} names {sorted(requirement)}")
+            for scheme in requirement:
+                allowed = scheme_paths.get(scheme)
+                if allowed is not None and not path.startswith(allowed):
+                    problems.append(
+                        f"operation {operation.get('operationId')} takes {scheme} on {path}, "
+                        f"which is outside {list(allowed)}"
+                    )
     if len(ids) != len(set(ids)):
         problems.append("two operations share an operationId")
     codes = doc.get("components", {}).get("schemas", {}).get("ErrorResponseCode", {}).get("enum", [])
@@ -212,11 +224,19 @@ def check(doc: dict) -> list[str]:
     return sorted(set(problems))
 
 
-def _operations(doc: dict):
-    for item in doc.get("paths", {}).values():
+METHODS = {"get", "put", "post", "delete", "patch", "head", "options", "trace"}
+
+
+def _path_operations(doc: dict):
+    for path, item in doc.get("paths", {}).items():
         for method, operation in item.items():
-            if method in {"get", "put", "post", "delete", "patch", "head", "options", "trace"}:
-                yield operation
+            if method in METHODS:
+                yield path, operation
+
+
+def _operations(doc: dict):
+    for _, operation in _path_operations(doc):
+        yield operation
 
 
 def _strings(node):
