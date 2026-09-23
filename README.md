@@ -17,7 +17,7 @@ The site holds two products. The menu at the top of the page moves between them.
 | Path | What it is |
 | --- | --- |
 | `index.html`, `assets/` | The page. It loads Scalar and the files below. No build step. |
-| `assets/fonts/` | Inter and Poppins, copied from the design system. The SIL licence files travel with them. |
+| `assets/fonts/` | Poppins, the standard font of the brand manual. The SIL licence travels with it. |
 | `vendor/scalar/standalone.js` | [Scalar API Reference](https://github.com/scalar/scalar) 1.71.0, MIT, copied unchanged. See `vendor/scalar/LICENSE`. |
 | `openapi/business/v4.json` | The current GTO Score schema. |
 | `openapi/business/<tag>.json` | A frozen copy of the GTO Score schema for each Release. |
