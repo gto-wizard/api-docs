@@ -18,18 +18,29 @@
     return as === 'text' ? response.text() : response.json();
   };
 
-  const [spec, guideFiles, versions] = await Promise.all([
+  const [gtoScore, fairPlay, guideIndex, versions] = await Promise.all([
     load('openapi/business/v4.json'),
+    load('openapi/fairplay/v1.json'),
     load('guides/index.json'),
     load('openapi/business/releases.json'),
   ]);
-  const guides = await Promise.all(guideFiles.map((file) => load(`guides/${file}`, 'text')));
-  spec.info.description = [spec.info.description, ...guides].join('\n\n');
+
+  // Each product carries its own guides, in front of its own reference.
+  const withGuides = async (spec, files) => {
+    const guides = await Promise.all(files.map((file) => load(`guides/${file}`, 'text')));
+    spec.info.description = [spec.info.description, ...guides].join('\n\n');
+    return spec;
+  };
+  await Promise.all([
+    withGuides(gtoScore, guideIndex['gto-score']),
+    withGuides(fairPlay, guideIndex.fairplay),
+  ]);
 
   // RFC 2606 reserves .invalid, so this host never resolves.
   const nowhere = 'https://scalar-disabled.invalid';
   const sources = [
-    { title: 'GTO Score v4 (current)', slug: 'v4', content: spec, default: true },
+    { title: 'GTO Score v4', slug: 'gto-score-v4', content: gtoScore, default: true },
+    { title: 'FairPlay v1', slug: 'fairplay-v1', content: fairPlay },
     ...versions.releases
       .slice()
       .reverse()

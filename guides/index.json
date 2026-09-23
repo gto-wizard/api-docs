@@ -1,10 +1,20 @@
-[
-  "01-authentication.md",
-  "02-scoring-a-batch.md",
-  "03-task-options.md",
-  "04-files-and-limits.md",
-  "05-results.md",
-  "06-billing-data-and-limits.md",
-  "07-tournament-inputs.md",
-  "08-completion-webhook.md"
-]
+{
+  "gto-score": [
+    "01-authentication.md",
+    "02-scoring-a-batch.md",
+    "03-task-options.md",
+    "04-files-and-limits.md",
+    "05-results.md",
+    "06-billing-data-and-limits.md",
+    "07-tournament-inputs.md",
+    "08-completion-webhook.md"
+  ],
+  "fairplay": [
+    "fairplay/01-what-fairplay-does.md",
+    "fairplay/02-authentication.md",
+    "fairplay/03-sending-a-batch.md",
+    "fairplay/04-reading-the-result.md",
+    "fairplay/05-limits.md",
+    "fairplay/06-player-boards.md"
+  ]
+}

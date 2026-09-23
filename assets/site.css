@@ -1,7 +1,202 @@
-/* Scalar ships without its web fonts here (they load from a third-party host). */
+/* GTO Wizard brand, applied to Scalar.
+ *
+ * The brand is dark. Inter carries the text, Poppins carries the headings, and the
+ * electric green marks one thing at a time: a link, an active item, the accent of a
+ * control. It is a signal, not a background.
+ *
+ * The faces are copied from the design system, not linked from a font host. A third
+ * host on a page that holds a partner token is a risk the site does not need, and
+ * the Content-Security-Policy in index.html blocks one anyway. The licences travel
+ * with the files, as the SIL Open Font Licence asks: assets/fonts/OFL-Inter.txt and
+ * assets/fonts/OFL-Poppins.txt.
+ *
+ * Latin only, and only the weights below. A glyph outside that range falls through
+ * to the next family in the stack.
+ */
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('fonts/inter-400.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('fonts/inter-500.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('fonts/inter-600.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('fonts/inter-700.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('fonts/poppins-600.woff2') format('woff2');
+}
+
+/* The brand tokens, copied from the design system. */
 :root {
-  --scalar-font: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  color-scheme: dark;
+
+  --gtow-green: #aafbb2;
+  --gtow-green-dark: #67de73;
+  --gtow-green-dim: rgba(170, 251, 178, 0.1);
+  --gtow-green-border: rgba(170, 251, 178, 0.25);
+
+  --gtow-bg: #09090c;
+  --gtow-surface-1: #121214;
+  --gtow-surface-2: #161618;
+  --gtow-surface-3: #1e1e21;
+
+  --gtow-fg-1: #ffffff;
+  --gtow-fg-2: rgba(255, 255, 255, 0.7);
+  --gtow-fg-3: rgba(255, 255, 255, 0.56);
+  --gtow-fg-disabled: rgba(255, 255, 255, 0.22);
+  --gtow-on-green: rgba(0, 0, 0, 0.87);
+
+  --gtow-divider: rgba(255, 255, 255, 0.12);
+  --gtow-border-soft: rgba(168, 168, 177, 0.23);
+
+  --gtow-success: #66bb6a;
+  --gtow-warning: #ffa726;
+  --gtow-error: #f44336;
+  --gtow-info: #29b6f6;
+}
+
+/* The same tokens, under the names Scalar reads. */
+:root {
+  --scalar-font: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   --scalar-font-code: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --scalar-background-1: var(--gtow-bg);
+  --scalar-background-2: var(--gtow-surface-1);
+  --scalar-background-3: var(--gtow-surface-2);
+  --scalar-background-accent: var(--gtow-green-dim);
+  --scalar-background-card: var(--gtow-surface-1);
+
+  --scalar-color-1: var(--gtow-fg-1);
+  --scalar-color-2: var(--gtow-fg-2);
+  --scalar-color-3: var(--gtow-fg-3);
+  --scalar-color-disabled: var(--gtow-fg-disabled);
+  --scalar-color-ghost: var(--gtow-fg-3);
+  --scalar-color-accent: var(--gtow-green);
+
+  --scalar-color-green: var(--gtow-green);
+  --scalar-color-red: var(--gtow-error);
+  --scalar-color-orange: var(--gtow-warning);
+  --scalar-color-blue: var(--gtow-info);
+
+  --scalar-border-color: var(--gtow-divider);
+  --scalar-radius: 6px;
+  --scalar-radius-lg: 12px;
+  --scalar-radius-xl: 16px;
+
+  --scalar-button-1: var(--gtow-green);
+  --scalar-button-1-color: var(--gtow-on-green);
+  --scalar-button-1-hover: var(--gtow-green-dark);
+
+  --scalar-link-color: var(--gtow-green);
+  --scalar-link-color-hover: var(--gtow-green-dark);
+  --scalar-link-color-visited: var(--gtow-green);
+
+  --scalar-sidebar-background-1: var(--gtow-surface-1);
+  --scalar-sidebar-border-color: var(--gtow-divider);
+  --scalar-sidebar-color-1: var(--gtow-fg-1);
+  --scalar-sidebar-color-2: var(--gtow-fg-2);
+  --scalar-sidebar-color-active: var(--gtow-green);
+  --scalar-sidebar-item-hover-background: rgba(168, 168, 177, 0.08);
+  --scalar-sidebar-item-hover-color: var(--gtow-fg-1);
+  --scalar-sidebar-item-active-background: var(--gtow-green-dim);
+  --scalar-sidebar-search-background: var(--gtow-surface-2);
+  --scalar-sidebar-search-border-color: var(--gtow-border-soft);
+  --scalar-sidebar-search-color: var(--gtow-fg-2);
+
+  --scalar-header-background-1: var(--gtow-surface-1);
+  --scalar-header-border-color: var(--gtow-divider);
+  --scalar-header-color-1: var(--gtow-fg-1);
+  --scalar-header-color-2: var(--gtow-fg-2);
+
+  --scalar-scrollbar-color: rgba(168, 168, 177, 0.2);
+  --scalar-scrollbar-color-active: rgba(168, 168, 177, 0.4);
+
+  --scalar-shadow-1: 0 1px 5px rgba(0, 0, 0, 0.24), 0 2px 2px rgba(0, 0, 0, 0.28);
+  --scalar-shadow-2: 0 3px 14px 2px rgba(0, 0, 0, 0.36), 0 8px 10px rgba(0, 0, 0, 0.28);
+}
+
+body {
+  background: var(--gtow-bg);
+  color: var(--gtow-fg-1);
+}
+
+/* Poppins carries the headings. Inter carries everything else. */
+.scalar-app h1,
+.scalar-app h2,
+.scalar-app h3,
+.section-header,
+.markdown h1,
+.markdown h2,
+.markdown h3 {
+  font-family: 'Poppins', 'Inter', system-ui, sans-serif;
+  font-weight: 600;
+}
+
+::selection {
+  background-color: color-mix(in srgb, var(--gtow-green) 24%, transparent);
+}
+
+/* The brand mark, above the sidebar. */
+#brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: var(--gtow-surface-1);
+  border-bottom: 1px solid var(--gtow-divider);
+}
+
+#brand svg {
+  color: var(--gtow-green);
+  flex: none;
+}
+
+#brand .brand-name {
+  font-family: 'Poppins', 'Inter', system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  letter-spacing: 0.01em;
+  color: var(--gtow-fg-1);
+}
+
+#brand .brand-kind {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gtow-green);
+  border: 1px solid var(--gtow-green-border);
+  background: var(--gtow-green-dim);
+  border-radius: 999px;
+  padding: 0.125rem 0.5rem;
 }
 
 /*
@@ -13,9 +208,17 @@
   display: none !important;
 }
 
-#load-error {
+#load-error,
+noscript {
+  display: block;
   margin: 2rem auto;
   max-width: 40rem;
   padding: 1rem;
   font-family: var(--scalar-font);
+  color: var(--gtow-fg-2);
+}
+
+#load-error a,
+noscript a {
+  color: var(--gtow-green);
 }
